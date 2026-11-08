@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "ingameinfoxml",
+  "version": "${version}",
+  "name": "InGame Info XML",
+  "description": "Display extra information on top of your ingame screen.\n\nUnofficial version maintained by DF11ZomGraves. Fabric port of the NeoForge 1.21.1 build.",
+  "authors": [
+    "DF11ZomGraves"
+  ],
+  "contributors": [
+    "DaftPVF",
+    "bspkrs",
+    "Lunatrius"
+  ],
+  "contact": {
+    "homepage": "https://github.com/DF11ZomGraves/InGameInfoXML",
+    "sources": "https://github.com/DF11ZomGraves/InGameInfoXML"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "df11zomgraves.ingameinfo.InGameInfoXML"
+    ],
+    "client": [
+      "df11zomgraves.ingameinfo.InGameInfoXMLClient"
+    ],
+    "modmenu": [
+      "df11zomgraves.ingameinfo.compat.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "ingameinfoxml.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "cloth-config": ">=15.0.0"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

@@ -1,0 +1,57 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version "1.17.19"
+    id 'maven-publish'
+}
+
+group = "df11zomgraves.ingameinfo"
+// version comes from gradle.properties (2.9.2.101, matching the NeoForge build)
+
+repositories {
+    // Cloth Config is on shedaniel's maven; it needs terraformersmc for its own deps.
+    maven { url = "https://maven.shedaniel.me/" }
+    maven { url = "https://maven.terraformersmc.com/releases/" }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    // Official Mojang mappings. NeoForge 1.21.1 is mojmap too, so the ~6700 lines of
+    // vanilla-facing code port over without a single rename.
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // Config: replaces both NeoForge's ModConfigSpec backend and its auto-generated
+    // ConfigurationScreen (Fabric has no IConfigScreenFactory equivalent).
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+
+    // Compile-only: gives the mod list a config button. Not a hard dependency — the
+    // "modmenu" entrypoint is only invoked when ModMenu is actually present.
+    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+}
+
+processResources {
+    // Do NOT use expand() here. Gradle's expand() is a Groovy SimpleTemplateEngine: it
+    // interprets backslash escapes in the output too, so a JSON "\n" inside the description
+    // gets rewritten as a real newline, producing invalid JSON that the loader rejects.
+    // ReplaceTokens with explicit ${} markers only substitutes the token we ask for.
+    filesMatching('fabric.mod.json') {
+        filter(org.apache.tools.ant.filters.ReplaceTokens,
+                tokens: [version: project.version],
+                beginToken: '${',
+                endToken: '}')
+    }
+}
+
+java {
+    withSourcesJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
